@@ -1,6 +1,6 @@
 # GoogleSpreadsheetBulkFetcher
 
-It uses OAuth 2 authentication to retrieve the values of all sheets with a single API access.
+Use OAuth 2 authentication to retrieve the values of all sheets with a single API access.
 
 Fork from taka0125/google_spreadsheet_fetcher
 

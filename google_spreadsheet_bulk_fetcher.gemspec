@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["yuya.yokosuka@gmail.com"]
 
   spec.summary       = %q{Google Spreadsheet bulk fetcher}
-  spec.description   = %q{Google Spreadsheet bulk fetcher}
+  spec.description   = %q{Use OAuth 2 authentication to retrieve the values of all sheets with a single API access.}
   spec.homepage      = "https://github.com/YuyaYokosuka/google_spreadsheet_bulk_fetcher"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
