@@ -1,13 +1,15 @@
-# GoogleSpreadsheetFetcher
+# GoogleSpreadsheetBulkFetcher
 
-Use OAuth 2 authentication to retrieve data from Google Spreadsheet.
+It uses OAuth 2 authentication to retrieve the values of all sheets with a single API access.
+
+Fork from taka0125/google_spreadsheet_fetcher
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'google_spreadsheet_fetcher'
+gem 'google_spreadsheet_bulk_fetcher'
 ```
 
 And then execute:
@@ -16,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install google_spreadsheet_fetcher
+    $ gem install google_spreadsheet_bulk_fetcher
 
 ## Usage
 
@@ -26,19 +28,20 @@ Or install it yourself as:
 - Download client secret json
 
 ```ruby
-credential_store_file = Rails.root.join('config', 'credential-oauth2-supporter.json').to_s
-sheet_key = 'YOUR_SHEET_KEY'
+sheet_key = 'example_sheet_id'
 
-GoogleSpreadsheetFetcher.configure do |config|
-  config.client_secrets_file_path = Rails.root.join('config', 'client_secrets_pokota_supporter.json').to_s
+GoogleSpreadsheetBulkFetcher.configure do |config|
+  config.client_secrets_file = 'client_secrets_file_path.json'
+  config.credential_store_file = 'credential_store_file_path.json'
 end
 
 user_id = 'sample'
-fetcher = GoogleSpreadsheetFetcher::Fetcher.new(credential_store_file, user_id, sheet_key)
+fetcher = GoogleSpreadsheetBulkFetcher::Fetcher.new(sheet_key, user_id)
+fetcher.fetch
 
-fetcher.fetch_by_index(0)
-fetcher.fetch_by_title('title')
-fetcher.fetch_by_gid('gid')
+fetcher.all_rows_by!(index: 0)
+fetcher.all_rows_by!(title: 'sheet_title')
+fetcher.all_rows_by!(sheet_id: 1234567890)
 ```
 
 ## Development
@@ -49,5 +52,5 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/taka0125/google_spreadsheet_fetcher.
+Bug reports and pull requests are welcome on GitHub at https://github.com/YuyaYokosuka/google_spreadsheet_bulk_fetcher.
 

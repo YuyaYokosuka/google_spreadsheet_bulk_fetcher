@@ -1,6 +1,6 @@
 require 'active_support/configurable'
 
-module GoogleSpreadsheetFetcher
+module GoogleSpreadsheetBulkFetcher
   class Config
     include ActiveSupport::Configurable
 

@@ -1,8 +1,8 @@
 require "spec_helper"
 
-RSpec.describe GoogleSpreadsheetFetcher do
+RSpec.describe GoogleSpreadsheetBulkFetcher do
   it "has a version number" do
-    expect(GoogleSpreadsheetFetcher::VERSION).not_to be nil
+    expect(GoogleSpreadsheetBulkFetcher::VERSION).not_to be nil
   end
 
   it "does something useful" do

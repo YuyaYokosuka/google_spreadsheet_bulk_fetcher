@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "google_spreadsheet_fetcher"
+require "google_spreadsheet_bulk_fetcher"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

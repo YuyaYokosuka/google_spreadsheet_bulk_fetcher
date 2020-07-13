@@ -1,17 +1,17 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'google_spreadsheet_fetcher/version'
+require 'google_spreadsheet_bulk_fetcher/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "google_spreadsheet_fetcher"
-  spec.version       = GoogleSpreadsheetFetcher::VERSION
-  spec.authors       = ["Takahiro Ooishi"]
-  spec.email         = ["taka0125@gmail.com"]
+  spec.name          = "google_spreadsheet_bulk_fetcher"
+  spec.version       = GoogleSpreadsheetBulkFetcher::VERSION
+  spec.authors       = ["Yuya Yokosuka"]
+  spec.email         = ["yuya.yokosuka@gmail.com"]
 
-  spec.summary       = %q{Google Spreadsheet fetcher}
-  spec.description   = %q{Google Spreadsheet fetcher}
-  spec.homepage      = "https://github.com/taka0125/google_spreadsheet_fetcher"
+  spec.summary       = %q{Google Spreadsheet bulk fetcher}
+  spec.description   = %q{Google Spreadsheet bulk fetcher}
+  spec.homepage      = "https://github.com/YuyaYokosuka/google_spreadsheet_bulk_fetcher"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})

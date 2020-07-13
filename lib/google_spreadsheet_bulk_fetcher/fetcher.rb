@@ -3,24 +3,36 @@ require 'googleauth'
 require 'googleauth/stores/file_token_store'
 require 'shellwords'
 
-module GoogleSpreadsheetFetcher
+module GoogleSpreadsheetBulkFetcher
   class Fetcher
     OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
     # @param [String] spreadsheet_id
     # @param [String] user_id
-    # @param [GoogleSpreadsheetFetcher::Config] config
+    # @param [GoogleSpreadsheetBulkFetcher::Config] config
     # @param [String] application_name
     def initialize(spreadsheet_id, user_id, config: nil, application_name: nil)
       @spreadsheet_id = spreadsheet_id
       @user_id = user_id
-      @config = config || GoogleSpreadsheetFetcher.config
+      @config = config || GoogleSpreadsheetBulkFetcher.config
       @application_name = application_name
+
+      @spreadsheet = nil
     end
 
-    def fetch_all_rows_by!(index: nil, sheet_id: nil, title: nil, skip: 0, structured: false)
-      sheet = fetch_sheet_by!(index: index, sheet_id: sheet_id, title: title)
-      fetch_all_rows(sheet, skip: skip, structured: structured)
+    def fetch
+      @spreadsheet = service.get_spreadsheet(@spreadsheet_id, fields: 'sheets(properties,data.rowData.values(formattedValue))')
+      self
+    end
+
+    # @param [Integer] index
+    # @param [Integer] sheet_id
+    # @param [String] title
+    # @param [Integer] skip
+    # @param [Boolean] structured
+    def all_rows_by!(index: nil, sheet_id: nil, title: nil, skip: 0, structured: false)
+      sheet = sheet_by!(index: index, sheet_id: sheet_id, title: title)
+      sheet_to_array(sheet, skip: skip, structured: structured)
     end
 
     def service
@@ -32,14 +44,30 @@ module GoogleSpreadsheetFetcher
 
     private
 
-    # @param [Google::Apis::SheetsV4::Sheet] sheet
-    # @param [Integer] skip
-    # @param [Boolean] structured
-    def fetch_all_rows(sheet, skip: 0, structured: false)
-      # https://developers.google.com/sheets/api/guides/concepts#a1_notation
-      range = "#{sheet.properties.title}!A:ZZ"
-      rows = service.get_spreadsheet_values(@spreadsheet_id, range)&.values
-      return [] if rows.blank?
+    def sheet_by!(index: nil, sheet_id: nil, title: nil)
+      raise SpreadsheetNotFound if @spreadsheet.sheets.blank?
+
+      if index.present?
+        return @spreadsheet.sheets.find { |sheet| sheet.properties.index == index }
+      elsif sheet_id.present?
+        return @spreadsheet.sheets.find { |sheet| sheet.properties.sheet_id == sheet_id }
+      elsif title.present?
+        return @spreadsheet.sheets.find { |sheet| sheet.properties.title == title }
+      end
+
+      raise SheetNotFound
+    end
+
+    def sheet_to_array(sheet, skip: 0, structured: false)
+      sheet_data = sheet&.data&.first
+      return [] if sheet_data.nil?
+
+      rows = sheet_data.row_data.map do |row_data|
+        values = row_data.values
+        next [''] if values.nil?
+
+        values.map { |cell| cell&.formatted_value || "" }
+      end
 
       headers = rows.first
       count = headers.count
@@ -52,23 +80,6 @@ module GoogleSpreadsheetFetcher
         rows.slice!(0, skip)
         rows.map { |r| fill_array(r, count) }
       end
-    end
-
-    def fetch_sheet_by!(index: nil, sheet_id: nil, title: nil)
-      sheets = spreadsheet.sheets
-      raise SheetNotFound if sheets.blank?
-
-      sheet = if index.present?
-                sheets[index]
-              elsif sheet_id.present?
-                sheets.find { |s| s.properties.sheet_id == sheet_id }
-              elsif title.present?
-                sheets.find { |s| s.properties.title == title }
-              end
-
-      return sheet if sheet.present?
-
-      raise SheetNotFound
     end
 
     def fetch_credentials
@@ -87,11 +98,7 @@ module GoogleSpreadsheetFetcher
       authorizer.get_and_store_credentials_from_code(user_id: @user_id, code: code, base_url: OOB_URI)
     end
 
-    def spreadsheet
-      @spreadsheet ||= service.get_spreadsheet(@spreadsheet_id)
-    end
-
-    def fill_array(items, count, fill: "")
+    def fill_array(items, count, fill: '')
       items + (count - items.count).times.map { fill }
     end
   end
